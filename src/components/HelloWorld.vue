@@ -9,7 +9,7 @@
         <h3>Fill The Details Below To Send Cash To The Organisation.</h3>
         <br />
         <div class="mb-4" style="border:2px solid black; border-radius: 10px;">
-          <h2 class="my-4">Using Mpesa PayBill Number.</h2>
+          <h2 class="my-4">Using Mpesa PayBill Number For Testing.</h2>
           <v-row class="mb-4">
             <v-col class="md-4">
               <h3>Amount:</h3>
@@ -23,15 +23,34 @@
               ></v-text-field>
             </v-col>
             <v-col class="md-4">
-              <v-btn outlined @click="sendMoney" color="success" fab large dark>
-                <v-icon v-show="showingProgressForSending" >mdi-send</v-icon>
+              <v-btn
+                outlined
+                @click="sendMoney"
+                class="d-inline-block"
+                color="success"
+                fab
+                large
+                dark
+              >
+                <v-icon v-show="showingProgressForSending">mdi-send</v-icon>
                 <v-progress-circular
-                v-show="!showingProgressForSending"
+                  v-show="!showingProgressForSending"
                   :size="50"
                   color="green"
                   indeterminate
                 ></v-progress-circular>
               </v-btn>
+              <span style="color:green" v-show="!showingProgressForSending">
+                Waiting
+              </span>
+              <div class="d-inline-block" v-if="!showingProgressForSending">
+                <hollow-dots-spinner
+                  :animation-duration="1000"
+                  :dot-size="8"
+                  :dots-num="3"
+                  color="green"
+                />
+              </div>
             </v-col>
           </v-row>
           <br />
@@ -44,18 +63,25 @@
 <script>
 import axios from "axios";
 import Pusher from "pusher-js";
+import { HollowDotsSpinner } from "epic-spinners";
+
 export default {
   name: "HelloWorld",
   mounted() {
-    // Pusher.logToConsole = true;
     var pusher = new Pusher("ff5ed2584a0c21619365", {
       cluster: "ap2",
     });
     var channel = pusher.subscribe("payment-channel");
-    channel.bind("PaymentEvent", function(data) {
-      // app.messages.push(JSON.stringify(data));
-      console.log("This is the pusher notification.");
-      console.log(data);
+    channel.bind("PaymentEvent", function(data) {   
+      console.log("This is amount.");   
+      console.log(this.amount);
+      this.showingProgressForSending = !this.showingProgressForSending;
+      if (data.content.TransAmount === String(this.amount+'.00')) {
+        console.log("I have made a Transacrion.");
+      }
+      else{
+        console.log("We Have Somathing Wrong.");
+      }
     });
   },
   data: () => ({
@@ -63,10 +89,12 @@ export default {
     messages: [],
     showingProgressForSending: true,
   }),
-  components: {},
+  components: {
+    HollowDotsSpinner,
+  },
   methods: {
     sendMoney() {
-      console.log("I have clicked end Money." + this.amount);
+      this.showingProgressForSending = !this.showingProgressForSending;
       var obj = {};
       obj["amount"] = this.amount;
       axios
