@@ -1,79 +1,49 @@
 <template>
-  <div id="app">
-    <h1 style="text-decoration:underline; color:black;"> <b>MPESA LARAVEL INTEGRATION WITH A REAL TIME APPLICATION.</b></h1>
-    <h3> Fill The Details Below To Send Cash To The Organisation.</h3>
-    <div class="container">        
-          <div class="row">
-            <div class="col-md-6">
-              Amount: <input v-model="amount" type="number" name="" id=""/>
-            </div>
-            <div class="col-md-6">
-              <br>
-              <button @click="sendMoney"> Send Money.</button>
-            </div>
+  <v-app>
+    <v-app-bar
+      app
+      color="primary"
+      dark
+    >
+      <div class="d-flex align-center">
+        <v-img
+          alt="Vuetify Logo"
+          class="shrink mr-2"
+          contain
+          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
+          transition="scale-transition"
+          width="40"
+        />
 
-          </div>        
-    </div>
-  </div>
+        <v-img
+          alt="Vuetify Name"
+          class="shrink mt-1 hidden-sm-and-down"
+          contain
+          min-width="100"
+          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
+          width="100"
+        />
+      </div>            
+    </v-app-bar>
+
+    <v-main>
+      <HelloWorld/>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
+import HelloWorld from './components/HelloWorld';
 
-import axios from "axios";
-import Pusher from 'pusher-js'
 export default {
-
-mounted(){
-  // Pusher.logToConsole = true;
-
-    var pusher = new Pusher('ff5ed2584a0c21619365', {
-      cluster: 'ap2'
-    });
-
-    var channel = pusher.subscribe('payment-channel');
-    channel.bind('PaymentEvent', function(data) {
-      // app.messages.push(JSON.stringify(data));
-      console.log("This is the pusher notification.");
-      console.log(data);
-      
-    });
-},
-
   name: 'App',
-  data: () => ({
-        amount:null,
-        messages: [],
-  }),
+
   components: {
-    
-  },
-  methods: {
-      sendMoney(){
-        console.log("I have clicked end Money."+this.amount);
-        var obj = {};
-        obj['amount'] = this.amount;
-        axios.post("https://safaricommobilemoneyintegration.georgekprojects.tk/api/simulateTransaction",obj).then(
-            // response => {    
-            //   // console.log(response);             
-            // }
-        ).catch( error =>{
-            console.log("This is the error in the request.");
-            console.log(error);
-        });
-      }
+    HelloWorld,
   },
 
-  
-}
+  data: () => ({
+    //
+  }),
+};
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
