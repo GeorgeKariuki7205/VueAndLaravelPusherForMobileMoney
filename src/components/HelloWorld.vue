@@ -81,10 +81,11 @@ export default {
     channel.bind("PaymentEvent", function(data) {   
        console.log(data);
        console.log("This is the data."+self.amount);
-       self.showingProgressForSending = !self.showingProgressForSending
+       
        if (data.content.TransAmount === String(self.amount+'.00')) {
         console.log("I have made a Valid Transacrion.");
         self.response = "I have made a Valid Transacrion.";
+        self.showingProgressForSending = !self.showingProgressForSending
       }
       else{
         console.log("We Have Somathing Wrong.  The Transaction Amount:"+data.content.TransAmount+"  The exact Amount In State is "+((self.amount).toString())+".00" );
