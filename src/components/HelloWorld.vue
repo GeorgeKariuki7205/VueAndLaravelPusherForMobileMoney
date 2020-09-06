@@ -88,7 +88,7 @@ export default {
         self.showingProgressForSending = !self.showingProgressForSending
       }
       else{
-        console.log("We Have Somathing Wrong.  The Transaction Amount:"+data.content.TransAmount+"  The exact Amount In State is "+((self.amount).toString())+".00" );
+        console.log("We Have Somathing Wrong.  The Transaction Amount:"+data.content.TransAmount);
         self.response = "You Are Not The Cash Sender.";
       }
        
