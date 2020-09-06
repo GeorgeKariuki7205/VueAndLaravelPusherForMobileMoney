@@ -53,6 +53,7 @@
               </div>
             </v-col>
           </v-row>
+          {{response}}
           <br />
         </div>
       </v-col>
@@ -64,37 +65,61 @@
 import axios from "axios";
 import Pusher from "pusher-js";
 import { HollowDotsSpinner } from "epic-spinners";
-
+import { mapGetters } from "vuex";
 export default {
   name: "HelloWorld",
-  mounted() {
+   computed: {
+    ...mapGetters(["sentAmountStateGetter"]),    
+  },
+  created() {  
+    const self = this;      
     var pusher = new Pusher("ff5ed2584a0c21619365", {
       cluster: "ap2",
     });
+    
     var channel = pusher.subscribe("payment-channel");
     channel.bind("PaymentEvent", function(data) {   
-      console.log("This is amount.");   
-      console.log(this.amount);
-      this.showingProgressForSending = !this.showingProgressForSending;
-      if (data.content.TransAmount === String(this.amount+'.00')) {
+       console.log(data);
+       console.log("This is the data."+self.amount);
+       self.showingProgressForSending = !self.showingProgressForSending
+       if (data.content.TransAmount === String(self.amount+'.00')) {
+        console.log("I have made a Valid Transacrion.");
+        self.response = "I have made a Valid Transacrion.";
+      }
+      else{
+        console.log("We Have Somathing Wrong.  The Transaction Amount:"+data.content.TransAmount+"  The exact Amount In State is "+((self.amount).toString())+".00" );
+        self.response = "You Are Not The Cash Sender.";
+      }
+       
+    });
+  },
+  data() {
+    return {
+      amount: null,
+      messages: [],
+      showingProgressForSending: true,
+      response:null,
+    }},
+  components: {
+    HollowDotsSpinner,
+  },
+  methods: {
+    pusherConfirmationFunction(data){
+      console.log("This is the pusherConfirmationFunction");
+      if (data.content.TransAmount === this.amount) {
         console.log("I have made a Transacrion.");
       }
       else{
         console.log("We Have Somathing Wrong.");
       }
-    });
-  },
-  data: () => ({
-    amount: null,
-    messages: [],
-    showingProgressForSending: true,
-  }),
-  components: {
-    HollowDotsSpinner,
-  },
-  methods: {
+    },
     sendMoney() {
       this.showingProgressForSending = !this.showingProgressForSending;
+
+      // ! this section is used to set the state for the mapGetters. 
+
+      this.$store.dispatch("settingAmountState",String(this.amount+'.00'));
+
       var obj = {};
       obj["amount"] = this.amount;
       axios
